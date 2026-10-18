@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: opsflow
+      POSTGRES_PASSWORD: opsflow_dev_only
+      POSTGRES_DB: opsflow
+    ports: ["5432:5432"]
+    volumes:
+      - "opsflow_pg:/var/lib/postgresql/data"
+      - "./docker/init-test-db.sql:/docker-entrypoint-initdb.d/01-create-test-db.sql:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opsflow -d opsflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  opsflow_pg:
